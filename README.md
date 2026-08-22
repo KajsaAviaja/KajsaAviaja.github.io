@@ -1,75 +1,57 @@
-# React + TypeScript + Vite
+# Svært og Trolddom Guide
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+En webbaseret guide til "Svært og Trolddom" — bygget som et undervisningsprojekt, der samtidig viser, hvordan man bygger en moderne hjemmeside med React.
 
-Currently, two official plugins are available:
+Guiden samler kapitler om spillet og om det techstack, siden selv er bygget med, i én søgbar, kapitelinddelt hjemmeside med lys/mørk tema.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Techstack
 
-## React Compiler
+- **React 19** + **TypeScript** — komponenter og statisk typetjek
+- **Vite** — dev-server og build
+- **React Router** — navigation mellem forside og kapitler
+- **Tailwind CSS 4** — styling
+- **react-markdown** + **react-syntax-highlighter** — render af kapitelindhold og kodeeksempler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Kom i gang
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Siden kører herefter på den adresse, Vite udskriver i terminalen (typisk `http://localhost:5173`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Andre kommandoer
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build    # typetjek + produktionsbuild
+npm run preview  # forhåndsvis produktionsbuild lokalt
+npm run lint     # kør ESLint
+```
+
+## Struktur
 
 ```
+src/
+  content/chapters/   Kapitlernes indhold som Markdown-filer
+  data/chapters.ts     Indlæser og parser kapitlerne (frontmatter + indhold)
+  routes/              Sider: forside, kapitel, fejlside
+  components/          Genbrugelige UI-dele (søgning, indholdsfortegnelse, temaskift)
+  hooks/                useTheme til lys/mørk tema
+```
+
+### Tilføj et nyt kapitel
+
+Opret en ny `.md`-fil i [src/content/chapters/](src/content/chapters/) med frontmatter:
+
+```md
+---
+title: Titel på kapitlet
+excerpt: Kort beskrivelse, vises i forhåndsvisninger.
+order: 5
+---
+
+Kapitlets indhold i Markdown.
+```
+
+Kapitlet dukker automatisk op i navigationen, sorteret efter `order`.
