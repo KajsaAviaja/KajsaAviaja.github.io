@@ -34,7 +34,7 @@ function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
               }`
             }
           >
-            {chapter.title}
+            {chapter.order}. {chapter.title}
           </NavLink>
         </li>
       ))}

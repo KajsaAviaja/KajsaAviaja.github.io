@@ -82,35 +82,55 @@ function Chapter() {
   const chapter = useLoaderData<ChapterData>();
   const isDark = useIsDarkTheme();
 
+  const counters = { h1: 0, h2: 0, h3: 0, h4: 0 };
+
   return (
     <article>
       <h1 className="font-serif text-3xl text-stone-900 sm:text-4xl dark:text-white">
-        {chapter.title}
+        {chapter.order}. {chapter.title}
       </h1>
 
       <div className="mt-6 space-y-4 text-base leading-7 text-stone-600 dark:text-stone-300">
         <ReactMarkdown
           components={{
-            h1: ({ children }) => (
-              <h1 className="font-serif text-2xl text-stone-900 sm:text-3xl dark:text-white">
-                {children}
-              </h1>
-            ),
-            h2: ({ children }) => (
-              <h2 className="font-serif text-xl text-stone-900 sm:text-2xl dark:text-white">
-                {children}
-              </h2>
-            ),
-            h3: ({ children }) => (
-              <h3 className="font-serif text-lg text-stone-900 sm:text-xl dark:text-white">
-                {children}
-              </h3>
-            ),
-            h4: ({ children }) => (
-              <h4 className="font-serif text-base font-semibold text-stone-900 sm:text-lg dark:text-white">
-                {children}
-              </h4>
-            ),
+            h1: ({ children }) => {
+              counters.h1 += 1;
+              counters.h2 = 0;
+              counters.h3 = 0;
+              counters.h4 = 0;
+              return (
+                <h1 className="font-serif text-2xl text-stone-900 sm:text-3xl dark:text-white">
+                  {chapter.order}.{counters.h1} {children}
+                </h1>
+              );
+            },
+            h2: ({ children }) => {
+              counters.h2 += 1;
+              counters.h3 = 0;
+              counters.h4 = 0;
+              return (
+                <h2 className="font-serif text-xl text-stone-900 sm:text-2xl dark:text-white">
+                  {chapter.order}.{counters.h1}.{counters.h2} {children}
+                </h2>
+              );
+            },
+            h3: ({ children }) => {
+              counters.h3 += 1;
+              counters.h4 = 0;
+              return (
+                <h3 className="font-serif text-lg text-stone-900 sm:text-xl dark:text-white">
+                  {chapter.order}.{counters.h1}.{counters.h2}.{counters.h3} {children}
+                </h3>
+              );
+            },
+            h4: ({ children }) => {
+              counters.h4 += 1;
+              return (
+                <h4 className="font-serif text-base font-semibold text-stone-900 sm:text-lg dark:text-white">
+                  {chapter.order}.{counters.h1}.{counters.h2}.{counters.h3}.{counters.h4} {children}
+                </h4>
+              );
+            },
             ul: ({ children }) => (
               <ul className="list-disc space-y-2 pl-6">{children}</ul>
             ),
