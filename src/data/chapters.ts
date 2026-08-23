@@ -54,34 +54,48 @@ function numberHeadings(body: string, order: number): string {
     .join('\n')
 }
 
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'oe')
+    .replace(/å/g, 'aa')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function buildExcerpt(body: string): string {
+  const firstParagraph = body
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .find((block) => block && !block.startsWith('#'))
+
+  if (!firstParagraph) return ''
+
+  const text = firstParagraph.replace(/\s+/g, ' ').trim()
+  return text.length > 160 ? `${text.slice(0, 160).trim()}…` : text
+}
+
 function parseChapter(path: string, raw: string): Chapter {
-  const slug = path.split('/').pop()!.replace(/\.md$/, '')
-  const normalized = raw.replace(/\r\n/g, '\n')
-  const match = normalized.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)
+  const filename = path.split('/').pop()!.replace(/\.md$/, '')
+  const match = /^(\d+)\s*-\s*(.+)$/.exec(filename)
 
   if (!match) {
-    throw new Error(`Chapter "${slug}" is missing frontmatter`)
+    throw new Error(`Chapter file "${filename}" must be named "[order] - [title].md"`)
   }
 
-  const [, frontmatter, body] = match
-  const fields = Object.fromEntries(
-    frontmatter
-      .split('\n')
-      .filter(Boolean)
-      .map((line) => {
-        const index = line.indexOf(':')
-        return [line.slice(0, index).trim(), line.slice(index + 1).trim()]
-      }),
-  )
-
-  const order = Number(fields.order ?? 0)
+  const [, orderText, title] = match
+  const order = Number(orderText)
+  const body = raw.replace(/\r\n/g, '\n').trim()
 
   return {
-    slug,
-    title: fields.title ?? slug,
-    excerpt: fields.excerpt ?? '',
+    slug: slugify(title),
+    title,
+    excerpt: buildExcerpt(body),
     order,
-    content: numberHeadings(body.trim(), order),
+    content: numberHeadings(body, order),
   }
 }
 

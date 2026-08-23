@@ -1,9 +1,3 @@
----
-title: Introduction
-excerpt: This gives a short introduction to the game, learning objectives and the components we use.
-order: 1
----
-
 Denne side tilbyder en praktisk introduktion til hvordan man kan lave et webspil baseret på sværd og trolddom med brug af værktøjer som React og TypeScript.
 Det primære mål er at tilegne sig færdigheder til selv at udvikle webbaserede spil i samme stil og få en generel viden om udvikling af hjemmesider med React og TypeScript.
 

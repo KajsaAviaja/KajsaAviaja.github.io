@@ -1,9 +1,3 @@
----
-title: Webudvikling 101
-excerpt: En introduktion til de værktøjer og teknologier, vi bygger webspillet med - forklaret for dig, der ikke har programmeret før.
-order: 2
----
-
 # Hvad Består en Hjemmeside af
 
 En hjemmeside er bygget op af flere lag, der arbejder sammen. I bund og grund består det af

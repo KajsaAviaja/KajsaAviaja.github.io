@@ -1,9 +1,3 @@
----
-title: Project Struktur
-excerpt: En kompakt vej gennem de regler, roller og rytmer, der betyder mest i starten.
-order: 4
----
-
 Vi fokuserer på filerne i mappen `src`, som indeholder 3 filer: `App.tsx`, `main.tsx` og `index.css`.
 
 Filerne der ender på `.tsx` indeholder vores React-kode - hvor vi definerer hvordan siden ser ud, og hvordan den fungerer. Filen der ender på `.css` er, som navnet antyder, hvor vi definerer CSS - vores styling af siden.
