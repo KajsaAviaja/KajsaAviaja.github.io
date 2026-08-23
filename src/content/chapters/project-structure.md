@@ -1,7 +1,7 @@
 ---
 title: Project Struktur
 excerpt: En kompakt vej gennem de regler, roller og rytmer, der betyder mest i starten.
-order: 3
+order: 4
 ---
 
 Vi fokuserer på filerne i mappen `src`, som indeholder 3 filer: `App.tsx`, `main.tsx` og `index.css`.
