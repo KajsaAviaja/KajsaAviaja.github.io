@@ -8,10 +8,13 @@ function Home() {
   return (
     <div className="space-y-10">
       <div>
-        <h2 className="font-serif text-2xl text-stone-900 sm:text-3xl dark:text-white">Velkommen</h2>
+        <h2 className="font-serif text-2xl text-stone-900 sm:text-3xl dark:text-white">
+          Velkommen!
+        </h2>
         <p className="mt-3 max-w-prose text-base leading-7 text-stone-600 dark:text-stone-300">
-          Denne guide samler reglerne, referencekortene og sessionsnoterne til
-          Svært og Trolddom ét sted.
+          Denne guide viser trin for trin, hvordan du bygger Svært og
+          Trolddom, et webbaseret eventyrspil inspireret af Sværd og
+          Trolddom, med værktøjer som React, TypeScript og Tailwind.
         </p>
         {firstChapter && (
           <Link
