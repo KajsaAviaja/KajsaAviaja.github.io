@@ -1,15 +1,15 @@
-Denne side tilbyder en praktisk introduktion til hvordan man kan lave et webspil baseret på sværd og trolddom med brug af værktøjer som React og TypeScript.
+Denne side tilbyder en praktisk introduktion til, hvordan man kan lave et webspil baseret på sværd og trolddom med brug af værktøjer som React og TypeScript.
 Det primære mål er at tilegne sig færdigheder til selv at udvikle webbaserede spil i samme stil og få en generel viden om udvikling af hjemmesider med React og TypeScript.
 
-I dette kapitel præsenterer vi kort hvad Sværd og Trolddom er, hvilke værktøjer vi bruger og hvorfor, og hvilket spil vi gerne vil udvikle.
+I dette kapitel præsenterer vi kort, hvad Sværd og Trolddom er, hvilke værktøjer vi bruger, og hvorfor, samt hvilket spil vi gerne vil udvikle.
 
 # Hvad er Sværd og Trolddom
 
-Sværd og Trolddom er en bogserie skrevet af Ian Livingstone. Det er en "choose your own adventure", hvor historien er afhængig af spillerens valg. I hver bog er man en person der begiver sig ud på et eventyr. De fleste bøger foregår i en fantasyverden, hvor man er udstyret med sværd, rustning, guld og proviant. Undervejs møder man forskellige karakterer og udfordringer og har mulighed for at samle forskellige genstande der gør det muligt at udforske andre dele af verdenen. I de fleste bøger skal spilleren ud og besejre en ond skurk for at vinde.
+Sværd og Trolddom er en bogserie skrevet af Ian Livingstone. Det er en "choose your own adventure", hvor historien er afhængig af spillerens valg. I hver bog er man en person, der begiver sig ud på et eventyr. De fleste bøger foregår i en fantasyverden, hvor man er udstyret med sværd, rustning, guld og proviant. Undervejs møder man forskellige karakterer og udfordringer og har mulighed for at samle forskellige genstande, der gør det muligt at udforske andre dele af verdenen. I de fleste bøger skal spilleren ud og besejre en ond skurk for at vinde.
 
-Når man starter spillet, bruges to sekssidede terninger til at bestemme spillerens evne, udholdenhed og held. Undervejs bruges terningerne også til at bestemme udfaldet af forskellige situationer, fx. kampe. Under eventyret bruger man et eventyrskema til at holde styr på sin evne, udholdenhed og held samt hvilke genstande man har, og hvor meget guld man har.
+Når man starter spillet, bruges to sekssidede terninger til at bestemme spillerens evne, udholdenhed og held. Undervejs bruges terningerne også til at bestemme udfaldet af forskellige situationer, fx kampe. Under eventyret bruger man et eventyrskema til at holde styr på sin evne, udholdenhed og held samt hvilke genstande man har, og hvor meget guld man har.
 
-Spillet foregår ved at man bevæger sig igennem forskellige 'rum', eller 'situationer'. Her kan man møde forskellige valgmuligheder. Disse kan fx være:
+Spillet foregår ved at man bevæger sig igennem forskellige "rum", eller "situationer". Her kan man møde forskellige valgmuligheder. Disse kan fx være:
 
 > Vil du klatre op i træet for at få bedre udsyn, gå til 287. Vil du i stedet undersøge kisten, gå til 181. Eller vil du gå tilbage til vejen og fortsætte mod nord, gå til 24.
 
@@ -25,11 +25,11 @@ I dette forløb fokuserer vi næsten udelukkende på frontend. For at undgå at 
 
 # Svært og Trolddom
 
-Svært og Trolddom er et spil der kører i en webbrowser, som er baseret på Sværd og Trolddom. Det indeholder mange af de samme elementer som Sværd og Trolddom, men der er også mulighed for at tilføje flere elementer senere i forløbet.
+Svært og Trolddom er et spil, der kører i en webbrowser, som er baseret på Sværd og Trolddom. Det indeholder mange af de samme elementer som Sværd og Trolddom, men der er også mulighed for at tilføje flere elementer senere i forløbet.
 
 Grundlæggende skal man kunne lave en **karakter** med navn, ejendele og færdigheder, som kan bevæge sig rundt i verdenen. Verdenen er defineret som **rum**, eller afsnit, og kan ligesom i Sværd og Trolddom være steder som egentlige rum, en kælder, en bjergside eller et vejkryds.
 
-I hvert rum kan man møde forskellige karakterer og situationer. Det kan for eksempel være en troldmand der sælger et magisk sværd, en låst dør man kun kan åbne med den rette nøgle, eller en trold man vækker, hvis man larmer for meget.
+I hvert rum kan man møde forskellige karakterer og situationer. Det kan for eksempel være en troldmand, der sælger et magisk sværd, en låst dør, man kun kan åbne med den rette nøgle, eller en trold man vækker, hvis man larmer for meget.
 
 Ligesom i Sværd og Trolddom vil mange udfald være baseret på terningkast.
 
