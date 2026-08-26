@@ -1,10 +1,24 @@
 import { useEffect } from 'react'
 import { NavLink } from 'react-router'
-import { chapters } from '../data/chapters'
+import { chapters, type Chapter } from '../data/chapters'
 
 interface TableOfContentsProps {
   isOpen: boolean
   onClose: () => void
+}
+
+type Group = { section?: string; chapters: Chapter[] }
+
+function groupBySection(items: Chapter[]): Group[] {
+  return items.reduce<Group[]>((groups, chapter) => {
+    const last = groups[groups.length - 1]
+    if (last && last.section === chapter.section) {
+      last.chapters.push(chapter)
+    } else {
+      groups.push({ section: chapter.section, chapters: [chapter] })
+    }
+    return groups
+  }, [])
 }
 
 function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
@@ -19,25 +33,40 @@ function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
+  const chapterLink = (chapter: Chapter) => (
+    <NavLink
+      to={`/chapters/${chapter.slug}`}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `-ml-px block border-l pl-4 text-sm leading-5 transition-colors ${
+          isActive
+            ? 'border-amber-700/70 text-amber-700 dark:border-amber-200/70 dark:text-amber-200'
+            : 'border-transparent text-stone-500 hover:border-stone-900/20 hover:text-stone-800 dark:text-stone-400 dark:hover:border-white/20 dark:hover:text-stone-200'
+        }`
+      }
+    >
+      {chapter.order}. {chapter.title}
+    </NavLink>
+  )
+
   const links = (
     <ul className="mt-4 space-y-3 border-l border-stone-900/10 dark:border-white/10">
-      {chapters.map((chapter) => (
-        <li key={chapter.slug}>
-          <NavLink
-            to={`/chapters/${chapter.slug}`}
-            onClick={onClose}
-            className={({ isActive }) =>
-              `-ml-px block border-l pl-4 text-sm leading-5 transition-colors ${
-                isActive
-                  ? 'border-amber-700/70 text-amber-700 dark:border-amber-200/70 dark:text-amber-200'
-                  : 'border-transparent text-stone-500 hover:border-stone-900/20 hover:text-stone-800 dark:text-stone-400 dark:hover:border-white/20 dark:hover:text-stone-200'
-              }`
-            }
-          >
-            {chapter.order}. {chapter.title}
-          </NavLink>
-        </li>
-      ))}
+      {groupBySection(chapters).map((group, index) =>
+        group.section ? (
+          <li key={`${group.section}-${index}`}>
+            <p className="pl-4 text-xs font-medium tracking-[0.16em] text-stone-400 uppercase dark:text-stone-500">
+              {group.section}
+            </p>
+            <ul className="mt-2 space-y-3">
+              {group.chapters.map((chapter) => (
+                <li key={chapter.slug}>{chapterLink(chapter)}</li>
+              ))}
+            </ul>
+          </li>
+        ) : (
+          group.chapters.map((chapter) => <li key={chapter.slug}>{chapterLink(chapter)}</li>)
+        ),
+      )}
     </ul>
   )
 

@@ -3,10 +3,11 @@ export type Chapter = {
   title: string
   excerpt: string
   order: number
+  section?: string
   content: string
 }
 
-const modules = import.meta.glob('/src/content/chapters/*.md', {
+const modules = import.meta.glob('/src/content/chapters/**/*.md', {
   eager: true,
   query: '?raw',
   import: 'default',
@@ -78,30 +79,78 @@ function buildExcerpt(body: string): string {
   return text.length > 160 ? `${text.slice(0, 160).trim()}…` : text
 }
 
-function parseChapter(path: string, raw: string): Chapter {
-  const filename = path.split('/').pop()!.replace(/\.md$/, '')
-  const match = /^(\d+)\s*-\s*(.+)$/.exec(filename)
+function parseNamePart(name: string): { order: number; title: string } {
+  const match = /^(\d+)\s*-\s*(.+)$/.exec(name)
 
   if (!match) {
-    throw new Error(`Chapter file "${filename}" must be named "[order] - [title].md"`)
+    throw new Error(`"${name}" must be named "[order] - [title]"`)
   }
 
-  const [, orderText, title] = match
-  const order = Number(orderText)
-  const body = raw.replace(/\r\n/g, '\n').trim()
-
-  return {
-    slug: slugify(title),
-    title,
-    excerpt: buildExcerpt(body),
-    order,
-    content: numberHeadings(body, order),
-  }
+  return { order: Number(match[1]), title: match[2] }
 }
 
-export const chapters: Chapter[] = Object.entries(modules)
-  .map(([path, raw]) => parseChapter(path, raw))
-  .sort((a, b) => a.order - b.order)
+type Entry = {
+  fileOrder: number
+  fileTitle: string
+  section?: { order: number; title: string }
+  raw: string
+}
+
+function parseEntry(path: string, raw: string): Entry {
+  const relative = path.replace('/src/content/chapters/', '')
+  const parts = relative.split('/')
+  const filename = parts.pop()!.replace(/\.md$/, '')
+  const { order: fileOrder, title: fileTitle } = parseNamePart(filename)
+
+  const section = parts.length > 0 ? parseNamePart(parts[0]) : undefined
+
+  return { fileOrder, fileTitle, section, raw }
+}
+
+// Chapters outside subfolders come first (ordered by their own number), then
+// each section subfolder in order, with its chapters ordered within it. The
+// [order] prefixes only control this ordering: the final numbering shown on
+// the site is a single continuous sequence (1, 2, 3, ...) across everything.
+function orderEntries(entries: Entry[]): Entry[] {
+  const rootEntries = entries
+    .filter((entry) => !entry.section)
+    .sort((a, b) => a.fileOrder - b.fileOrder)
+
+  const sectionGroups = new Map<string, { order: number; title: string; entries: Entry[] }>()
+  for (const entry of entries) {
+    if (!entry.section) continue
+    const key = `${entry.section.order}-${entry.section.title}`
+    const group = sectionGroups.get(key)
+    if (group) {
+      group.entries.push(entry)
+    } else {
+      sectionGroups.set(key, { order: entry.section.order, title: entry.section.title, entries: [entry] })
+    }
+  }
+
+  const sortedSections = [...sectionGroups.values()].sort((a, b) => a.order - b.order)
+  for (const group of sortedSections) {
+    group.entries.sort((a, b) => a.fileOrder - b.fileOrder)
+  }
+
+  return [...rootEntries, ...sortedSections.flatMap((group) => group.entries)]
+}
+
+export const chapters: Chapter[] = orderEntries(
+  Object.entries(modules).map(([path, raw]) => parseEntry(path, raw)),
+).map((entry, index) => {
+  const order = index + 1
+  const body = entry.raw.replace(/\r\n/g, '\n').trim()
+
+  return {
+    slug: slugify(entry.fileTitle),
+    title: entry.fileTitle,
+    excerpt: buildExcerpt(body),
+    order,
+    section: entry.section?.title,
+    content: numberHeadings(body, order),
+  }
+})
 
 export function getChapter(slug: string) {
   return chapters.find((chapter) => chapter.slug === slug)

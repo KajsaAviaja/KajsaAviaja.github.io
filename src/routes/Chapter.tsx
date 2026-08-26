@@ -78,6 +78,22 @@ function CodeBlock({
   );
 }
 
+function CounterDemo() {
+  const [antalKlik, setAntalKlik] = useState(0);
+
+  return (
+    <div className="flex justify-center rounded-lg bg-stone-900/5 p-6 dark:bg-white/5">
+      <button
+        type="button"
+        onClick={() => setAntalKlik((n) => n + 1)}
+        className="rounded-md bg-amber-700 px-4 py-2 font-medium text-white transition-colors hover:bg-amber-800 dark:bg-amber-200 dark:text-stone-900 dark:hover:bg-amber-300"
+      >
+        Jeg er klikket {antalKlik} gange
+      </button>
+    </div>
+  );
+}
+
 function Chapter() {
   const chapter = useLoaderData<ChapterData>();
   const isDark = useIsDarkTheme();
@@ -133,10 +149,19 @@ function Chapter() {
             hr: () => (
               <hr className="border-stone-900/10 dark:border-white/10" />
             ),
+            img: ({ src, alt }) => (
+              <img src={src} alt={alt} className="mx-auto block max-w-full" />
+            ),
             pre: ({ children }) => <>{children}</>,
             code: ({ className, children }) => {
               const language = /language-(\w+)/.exec(className ?? "")?.[1];
-              const isBlock = language !== undefined || String(children).includes("\n");
+
+              if (language === "livecounter") {
+                return <CounterDemo />;
+              }
+
+              const isBlock =
+                language !== undefined || String(children).includes("\n");
 
               if (!isBlock) {
                 return (
