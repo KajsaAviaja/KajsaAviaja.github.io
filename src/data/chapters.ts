@@ -1,3 +1,5 @@
+import { expandEnvironments } from '../lib/environments'
+
 export type Chapter = {
   slug: string
   title: string
@@ -140,7 +142,7 @@ export const chapters: Chapter[] = orderEntries(
   Object.entries(modules).map(([path, raw]) => parseEntry(path, raw)),
 ).map((entry, index) => {
   const order = index + 1
-  const body = entry.raw.replace(/\r\n/g, '\n').trim()
+  const body = expandEnvironments(entry.raw.replace(/\r\n/g, '\n').trim())
 
   return {
     slug: slugify(entry.fileTitle),
