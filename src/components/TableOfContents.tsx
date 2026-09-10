@@ -50,21 +50,27 @@ function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
   )
 
   const links = (
-    <ul className="mt-4 space-y-3 border-l border-stone-900/10 dark:border-white/10">
+    <ul className="mt-4 space-y-3">
       {groupBySection(chapters).map((group, index) =>
         group.section ? (
-          <li key={`${group.section}-${index}`}>
-            <p className="pl-4 text-xs font-medium tracking-[0.16em] text-stone-400 uppercase dark:text-stone-500">
+          <li key={`${group.section}-${index}`} className={index > 0 ? 'pt-1' : undefined}>
+            <p className="text-[11px] font-medium tracking-[0.16em] text-stone-500 uppercase dark:text-stone-400">
               {group.section}
             </p>
-            <ul className="mt-2 space-y-3">
+            <ul className="mt-2 space-y-3 border-l border-stone-900/10 dark:border-white/20">
               {group.chapters.map((chapter) => (
                 <li key={chapter.slug}>{chapterLink(chapter)}</li>
               ))}
             </ul>
           </li>
         ) : (
-          group.chapters.map((chapter) => <li key={chapter.slug}>{chapterLink(chapter)}</li>)
+          <li key={`root-${index}`}>
+            <ul className="space-y-3 border-l border-stone-900/10 dark:border-white/20">
+              {group.chapters.map((chapter) => (
+                <li key={chapter.slug}>{chapterLink(chapter)}</li>
+              ))}
+            </ul>
+          </li>
         ),
       )}
     </ul>
