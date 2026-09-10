@@ -1,3 +1,3 @@
-# Svært og Trolddom Guide
+# Svært og Trolddom – Kode dit eget eventyr
 
 En webbaseret guide til "Svært og Trolddom" — bygget som et undervisningsprojekt, der samtidig viser, hvordan man bygger en moderne hjemmeside med React.
