@@ -21,7 +21,7 @@ function Root() {
           <header className="flex flex-col gap-4 border-b border-stone-900/10 pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
             <Link to="/" className="shrink-0">
               <p className="text-xs uppercase tracking-[0.4em] text-amber-700/80 dark:text-amber-200/70">
-                Svært og Trolddom Guide
+                Svært og Trolddom – Kode dit eget eventyr
               </p>
             </Link>
 
