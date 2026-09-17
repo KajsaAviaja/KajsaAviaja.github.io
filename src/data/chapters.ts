@@ -1,4 +1,7 @@
 import { expandEnvironments } from '../lib/environments'
+import { expandWikilinks } from '../lib/wikilinks'
+import { slugify } from '../lib/slugify'
+import { GLOSSARY } from './glossary'
 
 export type Chapter = {
   slug: string
@@ -57,16 +60,35 @@ function numberHeadings(body: string, order: number): string {
     .join('\n')
 }
 
-function slugify(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/æ/g, 'ae')
-    .replace(/ø/g, 'oe')
-    .replace(/å/g, 'aa')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+const CONCEPT_FENCE_RE = /^(`{3,})concept(?:\s+(.*))?$/
+
+// Concept callouts need a stable, unique #slug so the "Definitioner i dette
+// kapitel" list (built from the same content string, see Chapter.tsx) can
+// link straight to the matching box. That id is computed here, once, at
+// module load — not inside the React render (which briefly ran it via a
+// mutable counter closed over by the `concept` environment renderer) since
+// StrictMode renders every component function twice and discarded the first
+// call's return value while keeping its side effect on the counter, handing
+// out the wrong (already-incremented) slug to the actually-rendered box.
+function embedConceptSlugs(body: string): string {
+  const counts = new Map<string, number>()
+
+  return body
+    .split('\n')
+    .map((line) => {
+      const match = CONCEPT_FENCE_RE.exec(line)
+      if (!match) return line
+
+      const [, fence, rawTitle] = match
+      const title = rawTitle?.trim() || 'Concept'
+      const base = slugify(title)
+      const count = counts.get(base) ?? 0
+      counts.set(base, count + 1)
+      const slug = count === 0 ? base : `${base}-${count + 1}`
+
+      return `${fence}concept ${slug} ${title}`
+    })
+    .join('\n')
 }
 
 function buildExcerpt(body: string): string {
@@ -142,7 +164,12 @@ export const chapters: Chapter[] = orderEntries(
   Object.entries(modules).map(([path, raw]) => parseEntry(path, raw)),
 ).map((entry, index) => {
   const order = index + 1
-  const body = expandEnvironments(entry.raw.replace(/\r\n/g, '\n').trim())
+  const withLinks = expandWikilinks(
+    entry.raw.replace(/\r\n/g, '\n').trim(),
+    GLOSSARY,
+    entry.fileTitle,
+  )
+  const body = embedConceptSlugs(expandEnvironments(withLinks))
 
   return {
     slug: slugify(entry.fileTitle),

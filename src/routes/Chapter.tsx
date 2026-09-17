@@ -1,4 +1,4 @@
-import { Children, useEffect, useState } from "react";
+import { Children, useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useLoaderData } from "react-router";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -8,6 +8,40 @@ import {
   oneLight,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { Chapter as ChapterData } from "../data/chapters";
+import { GLOSSARY_TERMS_BY_SLUG } from "../data/glossary";
+import GlossaryTermTooltip from "../components/GlossaryTermTooltip";
+
+// Concept fence lines are `` `{3,}concept <slug> <title>`` — the slug is
+// embedded once at build time (see embedConceptSlugs in ../data/chapters)
+// so this and the `concept` environment renderer below always agree on the
+// same id, however many times React (re-)renders either of them.
+const CONCEPT_HEADING_RE = /^`{3,}concept\s+(\S+)\s+(.+)$/gm;
+
+type ConceptEntry = { title: string; slug: string };
+
+function extractConcepts(content: string): ConceptEntry[] {
+  return [...content.matchAll(CONCEPT_HEADING_RE)].map((match) => ({
+    slug: match[1],
+    title: match[2].trim(),
+  }));
+}
+
+function parseConceptMeta(meta: string | undefined): {
+  slug: string;
+  title: string;
+} {
+  const trimmed = meta?.trim() ?? "";
+  const spaceIndex = trimmed.indexOf(" ");
+
+  if (spaceIndex === -1) {
+    return { slug: trimmed || "concept", title: "Concept" };
+  }
+
+  return {
+    slug: trimmed.slice(0, spaceIndex),
+    title: trimmed.slice(spaceIndex + 1).trim(),
+  };
+}
 
 type CalloutType = "concept" | "task";
 
@@ -74,14 +108,14 @@ const CALLOUT_COLORS: Record<
   { border: string; bg: string; text: string }
 > = {
   concept: {
-    border: "border-teal-600/20 dark:border-teal-300/20",
+    border: "border-teal-600/50 dark:border-teal-300/50",
     bg: "bg-teal-600/5 dark:bg-teal-400/5",
-    text: "text-teal-700/90 dark:text-teal-300/90",
+    text: "text-teal-700 dark:text-teal-300",
   },
   task: {
-    border: "border-amber-600/20 dark:border-amber-300/20",
+    border: "border-amber-600/50 dark:border-amber-300/50",
     bg: "bg-amber-600/5 dark:bg-amber-400/5",
-    text: "text-amber-700/90 dark:text-amber-300/90",
+    text: "text-amber-700 dark:text-amber-300",
   },
 };
 
@@ -89,23 +123,74 @@ function CalloutBox({
   type,
   label,
   children,
+  id,
 }: {
   type: CalloutType;
   label: string;
   children: ReactNode;
+  id?: string;
 }) {
   const colors = CALLOUT_COLORS[type];
 
   return (
     <div
-      className={`w-full overflow-hidden rounded-lg border not-italic ${colors.border} ${colors.bg}`}
+      id={id}
+      className={`w-full border-l-4 px-4 py-2 not-italic ${colors.border} ${colors.bg}`}
     >
-      <div className="px-4 py-3">
-        <p className={`font-serif text-base font-semibold ${colors.text}`}>
-          {label}
-        </p>
-        <div className="mt-2 space-y-3">{children}</div>
-      </div>
+      <p
+        className={`text-sm font-bold tracking-wide uppercase ${colors.text}`}
+      >
+        {label}
+      </p>
+      <div className="mt-1.5 space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function DefinitionsBox({ concepts }: { concepts: ConceptEntry[] }) {
+  const [open, setOpen] = useState(true);
+
+  if (concepts.length === 0) return null;
+
+  return (
+    <div className="mt-6 overflow-hidden rounded-lg border border-teal-600/30 bg-teal-600/5 dark:border-teal-300/30 dark:bg-teal-400/5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between px-4 py-2 font-serif text-sm font-semibold text-teal-700 transition-colors hover:bg-teal-600/10 dark:text-teal-300 dark:hover:bg-teal-400/10"
+      >
+        <span>Definitioner i dette kapitel</span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`shrink-0 text-teal-700/70 transition-transform dark:text-teal-300/70 ${open ? "rotate-180" : ""}`}
+        >
+          <path
+            d="M6 9L12 15L18 9"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+      {open && (
+        <ul className="columns-1 gap-x-8 space-y-1.5 px-4 py-3 sm:columns-2 [&_li]:break-inside-avoid">
+          {concepts.map((concept) => (
+            <li key={concept.slug}>
+              <a
+                href={`#${concept.slug}`}
+                className="text-teal-700 underline decoration-teal-700/40 underline-offset-2 hover:decoration-teal-700 dark:text-teal-300 dark:decoration-teal-300/40 dark:hover:decoration-teal-300"
+              >
+                {concept.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -263,6 +348,10 @@ function CounterDemo() {
 function Chapter() {
   const chapter = useLoaderData<ChapterData>();
   const isDark = useIsDarkTheme();
+  const concepts = useMemo(
+    () => extractConcepts(chapter.content),
+    [chapter.content],
+  );
 
   const nested = (source: string) => (
     <ReactMarkdown components={components}>{source}</ReactMarkdown>
@@ -283,11 +372,14 @@ function Chapter() {
       </div>
     ),
     center: (source) => <div className="text-center">{nested(source)}</div>,
-    concept: (source, meta) => (
-      <CalloutBox type="concept" label={meta?.trim() || "Concept"}>
-        {nested(source)}
-      </CalloutBox>
-    ),
+    concept: (source, meta) => {
+      const { slug, title } = parseConceptMeta(meta);
+      return (
+        <CalloutBox type="concept" label={title} id={slug}>
+          {nested(source)}
+        </CalloutBox>
+      );
+    },
     task: (source) => (
       <CalloutBox type="task" label="Prøv selv">
         {nested(source)}
@@ -324,14 +416,36 @@ function Chapter() {
     ol: ({ children }) => (
       <ol className="list-decimal space-y-2 pl-6">{children}</ol>
     ),
-    a: ({ children, href }) => (
-      <a
-        href={href}
-        className="text-amber-700 underline decoration-amber-700/40 underline-offset-2 hover:decoration-amber-700 dark:text-amber-200 dark:decoration-amber-200/40 dark:hover:decoration-amber-200"
-      >
-        {children}
-      </a>
-    ),
+    a: ({ children, href }) => {
+      const isGlossaryLink = href?.startsWith("/begreber#") ?? false;
+      const term = href && isGlossaryLink
+        ? GLOSSARY_TERMS_BY_SLUG.get(href.slice("/begreber#".length))
+        : undefined;
+
+      if (href && term) {
+        return (
+          <GlossaryTermTooltip term={term} href={href}>
+            {children}
+          </GlossaryTermTooltip>
+        );
+      }
+
+      if (isGlossaryLink) {
+        console.error(
+          `Unknown glossary term for link "${href}" — rendering as plain text.`,
+        );
+        return <>{children}</>;
+      }
+
+      return (
+        <a
+          href={href}
+          className="text-amber-700 underline decoration-amber-700/40 underline-offset-2 hover:decoration-amber-700 dark:text-amber-200 dark:decoration-amber-200/40 dark:hover:decoration-amber-200"
+        >
+          {children}
+        </a>
+      );
+    },
     blockquote: ({ children }) => (
       <blockquote className="border-l-2 border-amber-700/40 pl-4 italic text-stone-500 dark:border-amber-200/40 dark:text-stone-400">
         {children}
@@ -380,6 +494,8 @@ function Chapter() {
       <h1 className="font-serif text-3xl text-stone-900 sm:text-4xl dark:text-white">
         {chapter.order}. {chapter.title}
       </h1>
+
+      <DefinitionsBox concepts={concepts} />
 
       <div className="mt-6 space-y-4 text-base leading-7 text-stone-600 dark:text-stone-300">
         <ReactMarkdown components={components}>
