@@ -153,11 +153,11 @@ function DefinitionsBox({ concepts }: { concepts: ConceptEntry[] }) {
   if (concepts.length === 0) return null;
 
   return (
-    <div className="mt-6 overflow-hidden rounded-lg border border-teal-600/30 bg-teal-600/5 dark:border-teal-300/30 dark:bg-teal-400/5">
+    <div className="mt-6 overflow-hidden rounded-sm border border-teal-600/20 bg-teal-600/5 dark:border-teal-300/20 dark:bg-teal-400/5">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between px-4 py-2 font-serif text-sm font-semibold text-teal-700 transition-colors hover:bg-teal-600/10 dark:text-teal-300 dark:hover:bg-teal-400/10"
+        className="flex w-full items-center justify-between px-4 py-2 text-sm font-bold tracking-wide text-teal-700 uppercase transition-colors hover:bg-teal-600/10 dark:text-teal-300 dark:hover:bg-teal-400/10"
       >
         <span>Definitioner i dette kapitel</span>
         <svg
@@ -178,7 +178,7 @@ function DefinitionsBox({ concepts }: { concepts: ConceptEntry[] }) {
         </svg>
       </button>
       {open && (
-        <ul className="columns-1 gap-x-8 space-y-1.5 px-4 py-3 sm:columns-2 [&_li]:break-inside-avoid">
+        <ul className="list-disc columns-1 gap-x-8 space-y-1.5 px-4 py-3 pl-8 marker:text-teal-700/50 sm:columns-2 [&_li]:break-inside-avoid dark:marker:text-teal-300/50">
           {concepts.map((concept) => (
             <li key={concept.slug}>
               <a
