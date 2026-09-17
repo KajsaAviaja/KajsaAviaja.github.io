@@ -49,6 +49,30 @@ function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
     </NavLink>
   )
 
+  const footerLink = (to: string, icon: string, label: string) => (
+    <NavLink
+      to={to}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `flex items-center gap-2 text-sm leading-5 transition-colors ${
+          isActive
+            ? 'text-amber-700 dark:text-amber-200'
+            : 'text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200'
+        }`
+      }
+    >
+      <img src={icon} alt="" className="size-6 shrink-0 dark:invert" />
+      {label}
+    </NavLink>
+  )
+
+  const footerLinks = (
+    <div className="space-y-3 border-t border-stone-900/10 pt-4 dark:border-white/20">
+      {footerLink('/begreber', '/icons/dictionary.svg', 'Begreber')}
+      {footerLink('/info', '/icons/info.svg', 'Info')}
+    </div>
+  )
+
   const links = (
     <ul className="mt-4 space-y-3">
       {groupBySection(chapters).map((group, index) =>
@@ -79,15 +103,16 @@ function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
   return (
     <>
       <aside className="hidden lg:block">
-        <nav
-          aria-label="Indholdsfortegnelse"
-          className="sticky top-8 w-52 justify-self-end"
-        >
-          <p className="text-xs uppercase tracking-[0.32em] text-amber-700/70 dark:text-amber-200/60">
-            Indhold
-          </p>
-          {links}
-        </nav>
+        <div className="sticky top-8 flex h-[calc(100vh-4rem)] w-52 flex-col justify-self-end overflow-y-auto">
+          <nav aria-label="Indholdsfortegnelse">
+            <p className="text-xs uppercase tracking-[0.32em] text-amber-700/70 dark:text-amber-200/60">
+              Indhold
+            </p>
+            {links}
+          </nav>
+
+          <div className="mt-auto pt-4">{footerLinks}</div>
+        </div>
       </aside>
 
       <div
@@ -100,7 +125,7 @@ function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
 
       <nav
         aria-label="Indholdsfortegnelse"
-        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] overflow-y-auto bg-stone-50 px-6 py-8 shadow-xl transition-transform duration-200 ease-out lg:hidden dark:bg-slate-950 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[80vw] flex-col bg-stone-50 px-6 py-8 shadow-xl transition-transform duration-200 ease-out lg:hidden dark:bg-slate-950 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -127,7 +152,11 @@ function TableOfContents({ isOpen, onClose }: TableOfContentsProps) {
             </svg>
           </button>
         </div>
-        {links}
+
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          {links}
+          <div className="mt-auto pt-4">{footerLinks}</div>
+        </div>
       </nav>
     </>
   )

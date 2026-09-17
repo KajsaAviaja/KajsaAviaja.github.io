@@ -2,6 +2,8 @@ import { createBrowserRouter, type LoaderFunctionArgs } from 'react-router'
 import Root from './routes/Root'
 import Home from './routes/Home'
 import Chapter from './routes/Chapter'
+import Glossary from './routes/Glossary'
+import Info from './routes/Info'
 import ErrorPage from './routes/ErrorPage'
 import { getChapter, chapters } from './data/chapters'
 
@@ -27,6 +29,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Home, loader: homeLoader },
       { path: 'chapters/:slug', Component: Chapter, loader: chapterLoader },
+      { path: 'begreber', Component: Glossary },
+      { path: 'info', Component: Info },
     ],
   },
 ])
